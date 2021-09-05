@@ -91,18 +91,17 @@ func (k KlineStreamMessage) String() string {
 
 func getKline(kwr KlineWebsocketRequest) {
 	// url := fmt.Sprintf("wss://stream.binance.com:9443/ws/%s@kline_%s", strings.ToLower(kwr.Symbol), string(kwr.Interval))
-	// request := fmt.Sprintf("{\"method\":\"SUBSCRIBE\",\"params\":[\"btcusdt@kline_1m\"],\"id\":1}\"")
 	host := "stream.binance.com"
 	port := "9443"
 	topic := "btcusdt@kline_1m"
-	m := make(map[string]interface{})
-	m["method"] = "SUBSCRIBE"
-	m["params"] = topic
-	m["id"] = 1
+	// m := make(map[string]interface{})
+	// m["method"] = "SUBSCRIBE"
+	// m["params"] = topic
+	// m["id"] = 1
 
 	u := url.URL{Scheme: "wss", Host: host + ":" + port, Path: "ws/" + topic}
 	log.Println(u.String())
-	log.Println(m)
+	// log.Println(m)
 
 	c, hr, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
