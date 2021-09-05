@@ -37,14 +37,14 @@ type KlineStreamMessage struct {
 type Subscribe struct {
 	Method string   `json:"method"`
 	Params []string `json:"params"`
-	id     int      `json:"id"`
+	ID     uint     `json:"id"`
 }
 
 func NewSuscribe() *Subscribe {
 	return &Subscribe{
 		Method: "SUBSCRIBE",
 		Params: []string{"btcusdt@depth"},
-		id:     90,
+		ID:     1,
 	}
 }
 
@@ -64,23 +64,20 @@ func websocketConnection(scheme string, host string, path string, requestHeader 
 	}
 	defer ws.Close()
 
-	// ss := *NewSuscribe()
-	// // fmt.Printf("TIPO ID: %T\n", ss.id)
-	// err = ws.WriteJSON(ss)
-	// if err != nil {
-	// 	log.Fatal("[SUBSCRIBE ERROR]: \n", err)
-	// }
+	// SEND SUSCRIPTION REQUEST
+	ss := *NewSuscribe()
+	err = ws.WriteJSON(ss)
+	if err != nil {
+		log.Fatal("[SUBSCRIBE ERROR]: \n", err)
+	}
+	// RECEIVE RESPONSE
+	_, msg, err := ws.ReadMessage()
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println("[SUSCRIPTION RESPONSE", string(msg))
 
-	// msg := struct {
-	// 	result string
-	// 	id     int
-	// }{"asd", 0}
-	// msg := []byte{}
-	// _, msg, err = ws.ReadMessage()
-	// log.Println(err)
-	// log.Println(string(msg))
-
-	go func() {
+	func() {
 		for {
 			message := KlineStreamMessage{}
 			err := ws.ReadJSON(&message)
@@ -91,8 +88,6 @@ func websocketConnection(scheme string, host string, path string, requestHeader 
 		}
 	}()
 
-	for {
-	}
 }
 
 func main() {
