@@ -1,33 +1,53 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/url"
+	"time"
 
 	"github.com/Visn0/goBinance"
 )
 
 func main() {
-	topic := "btcusdt@kline_1m"
-	topics := []string{topic}
-	spoturl := url.URL{Scheme: "wss", Host: "stream.binance.com:9443", Path: "/ws"} // "wss://stream.binance.com:9443/ws"
+	// topic :=
+	topics := []string{"btcusdt@kline_1m", "ethusdt@bookTicker"}
+	// spothost := "stream.binance.com:9443"
+	futurehost := "fstream.binance.com"
+	url := url.URL{Scheme: "wss", Host: futurehost, Path: "/ws"} // "wss://stream.binance.com:9443/ws"
 
 	ws := goBinance.WebSocket{}
 	defer ws.Close()
-	ws.Connect(spoturl.String())
+	ws.Connect(url.String())
 
 	ss := goBinance.SubscribeMessage{Method: "SUBSCRIBE", Params: topics, ID: 1}
-	log.Println(ss)
+	log.Println("Trying to subscribe to:", ss)
 	ws.Subscribe(ss)
 
 	func() {
+		message := goBinance.KlineStreamMessage{}
+
 		for {
-			message := goBinance.KlineStreamMessage{}
-			err := ws.Conn.ReadJSON(&message)
+			start := time.Now()
+
+			m := make(map[string]interface{})
+			_, p, err := ws.Conn.ReadMessage()
 			if err != nil {
 				log.Fatal("[READ ERROR]: \n", err)
 			}
-			log.Println("[MESSAGE]: ", message)
+			_ = json.Unmarshal(p, &m)
+
+			if m["e"] == "kline" {
+				err = json.Unmarshal(p, &message)
+				if err != nil {
+					log.Println(err)
+				}
+				log.Println(message)
+			} else {
+				log.Println(m)
+			}
+
+			log.Println("Elapsed:", time.Since(start))
 		}
 	}()
 
