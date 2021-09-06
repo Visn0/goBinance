@@ -15,28 +15,23 @@ var btcusdt = make(chan goBinance.BookTickerStreamMessage, 1)
 const fee float64 = 0.04 / 100
 
 func createSocketReader(wsId uint, u url.URL, topic string, c *chan goBinance.BookTickerStreamMessage) {
-	// u := url.URL{Scheme: scheme, Host: host, Path: path} // "wss://stream.binance.com:9443/ws"
-
+	log.Println(wsId)
 	ws := goBinance.WebSocket{}
 	defer ws.Close()
 	ws.Connect(u.String())
 
+	log.Println("ok")
 	topicSlice := []string{topic}
 	ss := goBinance.SubscribeMessage{Method: "SUBSCRIBE", Params: topicSlice, ID: wsId}
 	log.Println("Trying to subscribe to:", ss)
 	ws.Subscribe(ss)
 
-	log.Println("ok")
-
 	for {
-		// message := goBinance.KlineStreamMessage{}
-		// msg := make(map[string]interface{})
 		msg := goBinance.BookTickerStreamMessage{}
 		err := ws.Conn.ReadJSON(&msg)
 		if err != nil {
 			log.Fatal("[READ ERROR]: \n", err)
 		}
-		// // *c <- msg
 		select {
 		case *c <- msg:
 			// log.Printf("[MESSAGE-%s]: %v\n", path, msg)
@@ -88,17 +83,16 @@ func main() {
 		"ethbtc@bookTicker",
 		"ethusdt@bookTicker",
 	}
-	// spothost := "stream.binance.com:9443"
-	futurehost := "fstream.binance.com"
-	url := url.URL{Scheme: "wss", Host: futurehost, Path: "/ws"} // "wss://stream.binance.com:9443/ws"
+	spothost := "stream.binance.com:9443"
+	// futurehost := "fstream.binance.com"
+	u := url.URL{Scheme: "wss", Host: spothost, Path: "/ws"} // "wss://stream.binance.com:9443/ws"
 	// Readers
-	go createSocketReader(1, url, topics[0], &btcusdt)
-	go createSocketReader(2, url, topics[1], &ethbtc)
-	go createSocketReader(3, url, topics[2], &ethusdt)
+	go createSocketReader(1, u, topics[0], &btcusdt)
+	go createSocketReader(2, u, topics[1], &ethbtc)
+	go createSocketReader(3, u, topics[2], &ethusdt)
 
-	// Sender
+	// // Sender
 	go createOrderSender("https", "stream.binance.com:9443", "api", &ethusdt, &ethbtc, &btcusdt)
-
 	for {
 	}
 }
