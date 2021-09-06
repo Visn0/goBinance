@@ -10,8 +10,10 @@ import (
 )
 
 func main() {
-	// topic :=
-	topics := []string{"btcusdt@kline_1m", "ethusdt@bookTicker"}
+	topics := []string{
+		"btcusdt@kline_1m",
+		"ethusdt@bookTicker",
+	}
 	// spothost := "stream.binance.com:9443"
 	futurehost := "fstream.binance.com"
 	url := url.URL{Scheme: "wss", Host: futurehost, Path: "/ws"} // "wss://stream.binance.com:9443/ws"
@@ -25,8 +27,6 @@ func main() {
 	ws.Subscribe(ss)
 
 	func() {
-		message := goBinance.KlineStreamMessage{}
-
 		for {
 			start := time.Now()
 
@@ -38,13 +38,19 @@ func main() {
 			_ = json.Unmarshal(p, &m)
 
 			if m["e"] == "kline" {
+				message := goBinance.KlineStreamMessage{}
 				err = json.Unmarshal(p, &message)
 				if err != nil {
 					log.Println(err)
 				}
-				log.Println(message)
+				log.Println(goBinance.ToString(message))
 			} else {
-				log.Println(m)
+				message := goBinance.BookTickerStreamMessage{}
+				err = json.Unmarshal(p, &message)
+				if err != nil {
+					log.Println(err)
+				}
+				log.Println(goBinance.ToString(message))
 			}
 
 			log.Println("Elapsed:", time.Since(start))

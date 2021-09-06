@@ -4,6 +4,12 @@ import (
 	"encoding/json"
 )
 
+func ToString(msg interface{}) string {
+	js, _ := json.MarshalIndent(msg, "", "\t")
+	s := string(js)
+	return s
+}
+
 type SubscribeMessage struct {
 	Method string   `json:"method"`
 	Params []string `json:"params"`
@@ -35,8 +41,11 @@ type KlineStreamMessage struct {
 	}
 }
 
-func (k KlineStreamMessage) String() string {
-	js, _ := json.MarshalIndent(k, "", "\t")
-	s := string(js)
-	return s
+type BookTickerStreamMessage struct {
+	UpdateID int    `json:"u"` // order book updateId
+	Symbol   string `json:"s"` // symbol
+	BidPrice string `json:"b"` // best bid price
+	BidQty   string `json:"B"` // best bid qty
+	AskPrice string `json:"a"` // best ask price
+	AskQty   string `json:"A"` // best ask qty
 }
