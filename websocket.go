@@ -27,15 +27,16 @@ func (ws *WebSocket) Close() {
 	ws.Conn.Close()
 }
 
-func (ws *WebSocket) Subscribe(request SubscribeMessage) {
+func (ws *WebSocket) SendMessage(request interface{}) []byte {
 	err := ws.Conn.WriteJSON(request)
 	if err != nil {
-		log.Fatal("[SUBSCRIBE ERROR]: \n", err)
+		log.Fatal("[ERROR]: \n", err)
 	}
 
 	_, msg, err := ws.Conn.ReadMessage()
 	if err != nil {
 		log.Println(err)
 	}
-	log.Println("[SUSCRIPTION RESPONSE", string(msg))
+	log.Println("[RESPONSE", string(msg))
+	return msg
 }

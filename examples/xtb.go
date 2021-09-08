@@ -79,10 +79,10 @@ func NewGetCommisionMessage(symbol string, volume float32) *GetCommissionMessage
 
 type GetTickPricesMessage struct {
 	XTBMessage
-	Arguments struct {
-		Symbol    string `json:"symbol"`
-		SessionID string `json:"streamSessionId"`
-	} `json:"arguments"`
+	// Arguments struct {
+	Symbol    string `json:"symbol"`
+	SessionID string `json:"streamSessionId"`
+	// } `json:"arguments"`
 	// MinArrivalTime int    `json:"minArrivalTime"`
 	// MaxLevel       int    `json:"maxLevel"`
 }
@@ -96,8 +96,8 @@ func NewGetTickPricesMessage(symbol string, sessionId string) *GetTickPricesMess
 		// SessionID: sessionId,
 	}
 
-	msg.Arguments.Symbol = symbol
-	msg.Arguments.SessionID = sessionId
+	// msg.Arguments.Symbol = symbol
+	// msg.Arguments.SessionID = sessionId
 
 	return msg
 }

@@ -55,15 +55,18 @@ func cashCycle(usdt float64, ethusdt float64, ethbtc float64, btcusdt float64) f
 func createOrderSender(scheme, host, path string,
 	ethusdtChannel, ethbtcChannel, btcusdtChannel *chan goBinance.BookTickerStreamMessage) {
 	usdt := 100.0
+
+	var ethusdt goBinance.BookTickerStreamMessage = <-*ethusdtChannel
+	var ethbtc goBinance.BookTickerStreamMessage = <-*ethbtcChannel
+	var btcusdt goBinance.BookTickerStreamMessage = <-*btcusdtChannel
+
 	for {
-		// USDT -> ETH -> BTC -> USDT
-		// fmt.Println("PREVIOUS")
-		ethusdt := <-*ethusdtChannel
-		// fmt.Printf("\n###### ethusdt\n")
-		ethbtc := <-*ethbtcChannel
-		// fmt.Printf("\n###### ethubtc\n")
-		btcusdt := <-*btcusdtChannel
-		// fmt.Printf("\n###### btcusdt\n")
+		select {
+		case ethusdt = <-*ethusdtChannel:
+		case ethbtc = <-*ethbtcChannel:
+		case btcusdt = <-*btcusdtChannel:
+		default:
+		}
 
 		eu, _ := strconv.ParseFloat(ethusdt.BestAskPrice, 32)
 		eb, _ := strconv.ParseFloat(ethbtc.BestAskPrice, 32)
