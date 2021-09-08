@@ -28,6 +28,8 @@ func (ws *WebSocket) Close() {
 }
 
 func (ws *WebSocket) Subscribe(request SubscribeMessage) {
+	log.Println("Trying to subscribe to:", request)
+
 	err := ws.Conn.WriteJSON(request)
 	if err != nil {
 		log.Fatal("[SUBSCRIBE ERROR]: \n", err)
